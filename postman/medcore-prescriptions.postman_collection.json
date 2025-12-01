@@ -1,0 +1,631 @@
+{
+	"info": {
+		"_postman_id": "prescription-service-2025",
+		"name": "MedCore - Prescriptions Service",
+		"description": "Colección completa para probar el servicio de prescripciones médicas",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Autenticación",
+			"item": [
+				{
+					"name": "Login MEDICO",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.environment.set(\"doctor_token\", jsonData.token);",
+									"    pm.environment.set(\"doctor_id\", jsonData.user.id);",
+									"    console.log(\"Token guardado:\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"doctor@medcore.com\",\n  \"password\": \"Doctor123!\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/auth/login",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "v1", "auth", "login"]
+						},
+						"description": "Login como MEDICO para obtener token"
+					},
+					"response": []
+				},
+				{
+					"name": "Login PACIENTE",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.environment.set(\"patient_token\", jsonData.token);",
+									"    pm.environment.set(\"patient_id\", jsonData.user.id);",
+									"    console.log(\"Token paciente guardado:\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"paciente@medcore.com\",\n  \"password\": \"Paciente123!\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/auth/login",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "v1", "auth", "login"]
+						},
+						"description": "Login como PACIENTE para probar permisos"
+					},
+					"response": []
+				},
+				{
+					"name": "Login ADMINISTRADOR",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.environment.set(\"admin_token\", jsonData.token);",
+									"    console.log(\"Token admin guardado:\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@medcore.com\",\n  \"password\": \"Admin123!\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/auth/login",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "v1", "auth", "login"]
+						},
+						"description": "Login como ADMINISTRADOR"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Alergias del Paciente",
+			"item": [
+				{
+					"name": "Registrar Alergia - Penicilina",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{doctor_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientId\": \"{{patient_id}}\",\n  \"allergen\": \"Penicilina\",\n  \"severity\": \"severa\",\n  \"allergyType\": \"medicamento\",\n  \"reactions\": \"Anafilaxia, dificultad respiratoria\",\n  \"notes\": \"Nunca administrar antibióticos derivados de penicilina\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/allergies",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "v1", "allergies"]
+						},
+						"description": "Registrar alergia severa a Penicilina"
+					},
+					"response": []
+				},
+				{
+					"name": "Registrar Alergia - Ibuprofeno",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{doctor_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientId\": \"{{patient_id}}\",\n  \"allergen\": \"Ibuprofeno\",\n  \"severity\": \"moderada\",\n  \"allergyType\": \"medicamento\",\n  \"reactions\": \"Urticaria, picazón\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/allergies",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "v1", "allergies"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ver Alergias del Paciente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{doctor_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/allergies/patient/:patientId",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "v1", "allergies", "patient", ":patientId"],
+							"variable": [
+								{
+									"key": "patientId",
+									"value": "{{patient_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Prescripciones",
+			"item": [
+				{
+					"name": "Crear Prescripción SIN alergias",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    pm.environment.set(\"prescription_id\", jsonData.prescription.id);",
+									"    console.log(\"Prescripción creada:\", jsonData.prescription.prescriptionNumber);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{doctor_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientId\": \"{{patient_id}}\",\n  \"diagnosis\": \"Infección respiratoria aguda\",\n  \"observations\": \"Paciente con tos y fiebre. Tomar abundante líquido.\",\n  \"medications\": [\n    {\n      \"name\": \"Amoxicilina\",\n      \"genericName\": \"Amoxicilina\",\n      \"dosage\": \"500mg\",\n      \"frequency\": \"Cada 8 horas\",\n      \"duration\": 7,\n      \"durationType\": \"días\",\n      \"administrationRoute\": \"Oral\",\n      \"instructions\": \"Tomar después de las comidas\"\n    },\n    {\n      \"name\": \"Acetaminofén\",\n      \"genericName\": \"Paracetamol\",\n      \"dosage\": \"500mg\",\n      \"frequency\": \"Cada 6 horas\",\n      \"duration\": 5,\n      \"durationType\": \"días\",\n      \"administrationRoute\": \"Oral\",\n      \"instructions\": \"Solo si hay fiebre mayor a 38°C\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/prescriptions",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "v1", "prescriptions"]
+						},
+						"description": "Crear prescripción con medicamentos seguros (sin alergias)"
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Prescripción CON advertencia de alergia",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{doctor_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientId\": \"{{patient_id}}\",\n  \"diagnosis\": \"Dolor lumbar agudo\",\n  \"observations\": \"Reposo relativo, aplicar calor local\",\n  \"medications\": [\n    {\n      \"name\": \"Ibuprofeno\",\n      \"genericName\": \"Ibuprofeno\",\n      \"dosage\": \"400mg\",\n      \"frequency\": \"Cada 8 horas\",\n      \"duration\": 5,\n      \"durationType\": \"días\",\n      \"administrationRoute\": \"Oral\",\n      \"instructions\": \"Tomar con alimentos\",\n      \"warnings\": \"Puede causar molestias gastrointestinales\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/prescriptions",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "v1", "prescriptions"]
+						},
+						"description": "Esta prescripción debe generar ADVERTENCIA porque el paciente es alérgico a Ibuprofeno"
+					},
+					"response": []
+				},
+				{
+					"name": "Ver Prescripción por ID (MEDICO)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{doctor_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/prescriptions/:id",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "v1", "prescriptions", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{prescription_id}}"
+								}
+							]
+						},
+						"description": "Ver detalles de una prescripción (médico solo ve las que él creó)"
+					},
+					"response": []
+				},
+				{
+					"name": "Ver Prescripción por ID (PACIENTE)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{patient_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/prescriptions/:id",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "v1", "prescriptions", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{prescription_id}}"
+								}
+							]
+						},
+						"description": "Paciente ve solo sus propias prescripciones"
+					},
+					"response": []
+				},
+				{
+					"name": "Mis Prescripciones (MEDICO)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{doctor_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/prescriptions/doctor/me?page=1&limit=10&status=ACTIVE",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "v1", "prescriptions", "doctor", "me"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "status",
+									"value": "ACTIVE"
+								}
+							]
+						},
+						"description": "Obtener prescripciones que el médico autenticado ha creado"
+					},
+					"response": []
+				},
+				{
+					"name": "Prescripciones por Paciente",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{doctor_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/prescriptions/patient/:patientId?page=1&limit=10",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "v1", "prescriptions", "patient", ":patientId"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							],
+							"variable": [
+								{
+									"key": "patientId",
+									"value": "{{patient_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Estado a COMPLETED",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{doctor_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"COMPLETED\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/prescriptions/:id/status",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "v1", "prescriptions", ":id", "status"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{prescription_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Descargar PDF",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{doctor_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/prescriptions/:id/pdf",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "v1", "prescriptions", ":id", "pdf"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{prescription_id}}"
+								}
+							]
+						},
+						"description": "Descargar prescripción en formato PDF"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Pruebas de Permisos",
+			"item": [
+				{
+					"name": "❌ PACIENTE intenta crear prescripción",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{patient_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientId\": \"{{patient_id}}\",\n  \"diagnosis\": \"Test\",\n  \"medications\": []\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/prescriptions",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "v1", "prescriptions"]
+						},
+						"description": "Debe fallar con 403 - Solo médicos pueden crear prescripciones"
+					},
+					"response": []
+				},
+				{
+					"name": "❌ Sin Token - Acceso denegado",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/prescriptions/doctor/me",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "3000",
+							"path": ["api", "v1", "prescriptions", "doctor", "me"]
+						},
+						"description": "Debe fallar con 401 - No autenticado"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "doctor_token",
+			"value": ""
+		},
+		{
+			"key": "patient_token",
+			"value": ""
+		},
+		{
+			"key": "admin_token",
+			"value": ""
+		},
+		{
+			"key": "doctor_id",
+			"value": ""
+		},
+		{
+			"key": "patient_id",
+			"value": ""
+		},
+		{
+			"key": "prescription_id",
+			"value": ""
+		}
+	]
+}

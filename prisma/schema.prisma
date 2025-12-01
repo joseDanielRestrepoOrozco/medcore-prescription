@@ -1,0 +1,67 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
+
+enum PrescriptionStatus {
+    ACTIVE
+    COMPLETED
+    CANCELLED
+}
+
+model Prescription {
+    id                 String             @id @default(auto()) @map("_id") @db.ObjectId
+    prescriptionNumber String             @unique
+    patientId          String             @db.ObjectId
+    doctorId           String             @db.ObjectId
+    appointmentId      String?            @db.ObjectId
+    diagnosticId       String?            @db.ObjectId
+    diagnosis          String
+    observations       String?
+    status             PrescriptionStatus @default(ACTIVE)
+    allergiesChecked   Boolean            @default(false)
+    allergyWarnings    String[]
+    createdAt          DateTime           @default(now())
+    updatedAt          DateTime           @updatedAt
+    medications        Medication[]
+
+    @@index([patientId])
+    @@index([doctorId])
+    @@index([createdAt])
+}
+
+model Medication {
+    id                  String       @id @default(auto()) @map("_id") @db.ObjectId
+    prescriptionId      String       @db.ObjectId
+    prescription        Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+    name                String
+    genericName         String?
+    dosage              String // "500mg", "10ml"
+    frequency           String // "cada 8 horas", "3 veces al día"
+    duration            Int // número de días/semanas/meses
+    durationType        String // "días", "semanas", "meses"
+    administrationRoute String // "oral", "intravenosa", "tópica", "intramuscular"
+    instructions        String?
+    warnings            String?
+    createdAt           DateTime     @default(now())
+
+    @@index([prescriptionId])
+}
+
+model PatientAllergy {
+    id            String    @id @default(auto()) @map("_id") @db.ObjectId
+    patientId     String    @db.ObjectId
+    allergyType   String // "medicamento", "alimento", "ambiental"
+    allergen      String // nombre del alérgeno: "penicilina", "ibuprofeno", etc.
+    severity      String // "leve", "moderada", "severa"
+    reaction      String? // descripción de la reacción alérgica
+    diagnosedDate DateTime?
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+
+    @@index([patientId])
+}
