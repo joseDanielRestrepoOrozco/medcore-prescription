@@ -1,0 +1,795 @@
+{
+	"info": {
+		"_postman_id": "prescription-sprint-test-2025",
+		"name": "MedCore - Prescription Service (Sprint Testing)",
+		"description": "Colección completa para probar el servicio de prescripciones médicas incluyendo verificación de alergias, templates de medicamentos y generación de PDFs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "1. Autenticación",
+			"item": [
+				{
+					"name": "Login como MEDICO",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('authToken', response.token);",
+									"    pm.collectionVariables.set('doctorId', response.user.id);",
+									"    console.log('✅ Token guardado para MEDICO');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"doctor@medcore.com\",\n  \"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{authServiceUrl}}/auth/login",
+							"host": [
+								"{{authServiceUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Obtiene token JWT para un médico"
+					},
+					"response": []
+				},
+				{
+					"name": "Login como ENFERMERA",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('nurseToken', response.token);",
+									"    pm.collectionVariables.set('nurseId', response.user.id);",
+									"    console.log('✅ Token guardado para ENFERMERA');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"enfermera@medcore.com\",\n  \"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{authServiceUrl}}/auth/login",
+							"host": [
+								"{{authServiceUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Obtiene token JWT para una enfermera"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Templates de Medicamentos",
+			"item": [
+				{
+					"name": "Listar todos los templates",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/medication-templates",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medication-templates"
+							]
+						},
+						"description": "Obtiene los 12 templates de medicamentos predefinidos"
+					},
+					"response": []
+				},
+				{
+					"name": "Filtrar por categoría (Antibiótico)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/medication-templates?category=Antibiótico",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medication-templates"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "Antibiótico"
+								}
+							]
+						},
+						"description": "Filtra medicamentos por categoría"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar por nombre (ibuprofeno)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/medication-templates?search=ibuprofeno",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medication-templates"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "ibuprofeno"
+								}
+							]
+						},
+						"description": "Busca medicamentos por nombre"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener template por código (MED-001)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const template = pm.response.json();",
+									"    console.log('✅ Template encontrado:', template.name);",
+									"    console.log('Categoría:', template.category);",
+									"    console.log('Diagnósticos comunes:', template.commonDiagnosis);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/medication-templates/MED-001",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medication-templates",
+								"MED-001"
+							]
+						},
+						"description": "Obtiene el template de Acetaminofén"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener categorías disponibles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/medication-templates/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medication-templates",
+								"categories"
+							]
+						},
+						"description": "Lista todas las categorías de medicamentos"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Gestión de Alergias",
+			"item": [
+				{
+					"name": "Registrar alergia a penicilina",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const allergy = pm.response.json();",
+									"    pm.collectionVariables.set('allergyId', allergy.id);",
+									"    console.log('✅ Alergia registrada:', allergy.allergen);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"allergyType\": \"medicamento\",\n  \"allergen\": \"penicilina\",\n  \"severity\": \"severa\",\n  \"reaction\": \"Anafilaxia\",\n  \"diagnosedDate\": \"2025-01-15\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/allergies",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"allergies"
+							]
+						},
+						"description": "Registra una alergia para probar la validación automática"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener alergias del paciente",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/allergies/patient/{{patientId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"allergies",
+								"patient",
+								"{{patientId}}"
+							]
+						},
+						"description": "Lista todas las alergias del paciente"
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar alergia",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/allergies/{{allergyId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"allergies",
+								"{{allergyId}}"
+							]
+						},
+						"description": "Elimina una alergia (ejecutar después de las pruebas)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Prescripciones",
+			"item": [
+				{
+					"name": "✅ Crear prescripción sin alergias",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('prescriptionId', response.prescription.id);",
+									"    console.log('✅ Prescripción creada:', response.prescription.prescriptionNumber);",
+									"    console.log('Tiene alergias:', response.hasAllergies);",
+									"    console.log('Advertencias:', response.allergyWarnings);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"diagnosticId\": \"{{diagnosticId}}\",\n  \"diagnosis\": \"Cefalea tensional\",\n  \"medications\": [\n    {\n      \"name\": \"Acetaminofén\",\n      \"genericName\": \"Paracetamol\",\n      \"dosage\": \"500mg\",\n      \"frequency\": \"cada 8 horas\",\n      \"duration\": 3,\n      \"durationType\": \"días\",\n      \"administrationRoute\": \"oral\",\n      \"instructions\": \"Tomar con alimentos\",\n      \"warnings\": \"No exceder 4g diarios\"\n    },\n    {\n      \"name\": \"Ibuprofeno\",\n      \"genericName\": \"Ibuprofeno\",\n      \"dosage\": \"400mg\",\n      \"frequency\": \"cada 12 horas\",\n      \"duration\": 5,\n      \"durationType\": \"días\",\n      \"administrationRoute\": \"oral\",\n      \"instructions\": \"Tomar después de las comidas\"\n    }\n  ],\n  \"observations\": \"Control en 5 días si persisten los síntomas\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/prescriptions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"prescriptions"
+							]
+						},
+						"description": "Crea una prescripción sin medicamentos que generen alergias"
+					},
+					"response": []
+				},
+				{
+					"name": "⚠️ Crear prescripción con ALERGIA detectada",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Esta petición debería retornar 201 con advertencias",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    console.log('⚠️ Prescripción creada CON ADVERTENCIAS');",
+									"    console.log('Advertencias de alergias:', response.allergyWarnings);",
+									"    console.log('Tiene alergias:', response.hasAllergies);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"diagnosis\": \"Faringitis aguda\",\n  \"medications\": [\n    {\n      \"name\": \"Amoxicilina\",\n      \"genericName\": \"Amoxicilina\",\n      \"dosage\": \"500mg\",\n      \"frequency\": \"cada 8 horas\",\n      \"duration\": 7,\n      \"durationType\": \"días\",\n      \"administrationRoute\": \"oral\",\n      \"instructions\": \"Tomar con alimentos\",\n      \"warnings\": \"No usar en alérgicos a penicilina\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/prescriptions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"prescriptions"
+							]
+						},
+						"description": "Crea prescripción con Amoxicilina cuando el paciente es alérgico a penicilina. Debe generar advertencias automáticas."
+					},
+					"response": []
+				},
+				{
+					"name": "Crear prescripción con duración en SEMANAS",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"diagnosis\": \"Hipertensión arterial\",\n  \"medications\": [\n    {\n      \"name\": \"Losartán\",\n      \"genericName\": \"Losartán\",\n      \"dosage\": \"50mg\",\n      \"frequency\": \"cada 24 horas\",\n      \"duration\": 4,\n      \"durationType\": \"semanas\",\n      \"administrationRoute\": \"oral\",\n      \"instructions\": \"Tomar en la mañana\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/prescriptions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"prescriptions"
+							]
+						},
+						"description": "Prueba la duración en semanas"
+					},
+					"response": []
+				},
+				{
+					"name": "Crear prescripción con duración en MESES",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"diagnosis\": \"Diabetes tipo 2\",\n  \"medications\": [\n    {\n      \"name\": \"Metformina\",\n      \"genericName\": \"Metformina\",\n      \"dosage\": \"850mg\",\n      \"frequency\": \"cada 12 horas\",\n      \"duration\": 3,\n      \"durationType\": \"meses\",\n      \"administrationRoute\": \"oral\",\n      \"instructions\": \"Tomar con las comidas principales\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/prescriptions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"prescriptions"
+							]
+						},
+						"description": "Prueba la duración en meses"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener prescripciones del paciente",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/prescriptions/patient/{{patientId}}?page=1&limit=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"prescriptions",
+								"patient",
+								"{{patientId}}"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Historial de prescripciones del paciente con paginación"
+					},
+					"response": []
+				},
+				{
+					"name": "Filtrar prescripciones ACTIVAS",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/prescriptions/patient/{{patientId}}?status=ACTIVE",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"prescriptions",
+								"patient",
+								"{{patientId}}"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "ACTIVE"
+								}
+							]
+						},
+						"description": "Filtra solo prescripciones activas"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener mis prescripciones (como doctor)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/prescriptions/doctor/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"prescriptions",
+								"doctor",
+								"me"
+							]
+						},
+						"description": "Prescripciones creadas por el doctor autenticado"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener prescripción por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/prescriptions/{{prescriptionId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"prescriptions",
+								"{{prescriptionId}}"
+							]
+						},
+						"description": "Obtiene una prescripción específica"
+					},
+					"response": []
+				},
+				{
+					"name": "Descargar PDF de prescripción",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/prescriptions/{{prescriptionId}}/pdf",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"prescriptions",
+								"{{prescriptionId}}",
+								"pdf"
+							]
+						},
+						"description": "Descarga el PDF con la prescripción médica completa incluyendo advertencias de alergias"
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar estado a COMPLETED",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"COMPLETED\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/prescriptions/{{prescriptionId}}/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"prescriptions",
+								"{{prescriptionId}}",
+								"status"
+							]
+						},
+						"description": "Actualiza el estado de la prescripción"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Pruebas ENFERMERA",
+			"item": [
+				{
+					"name": "❌ ENFERMERA NO puede crear prescripción",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Debe retornar 403 Forbidden",
+									"pm.test('ENFERMERA no puede crear prescripción', function() {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{nurseToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"diagnosis\": \"Test\",\n  \"medications\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/prescriptions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"prescriptions"
+							]
+						},
+						"description": "Verifica que ENFERMERA no puede crear prescripciones (debe retornar 403)"
+					},
+					"response": []
+				},
+				{
+					"name": "✅ ENFERMERA puede ver prescripciones",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Debe retornar 200 OK",
+									"pm.test('ENFERMERA puede ver prescripciones', function() {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{nurseToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/prescriptions/patient/{{patientId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"prescriptions",
+								"patient",
+								"{{patientId}}"
+							]
+						},
+						"description": "Verifica que ENFERMERA puede ver prescripciones de pacientes"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3005/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "authServiceUrl",
+			"value": "http://localhost:3001/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "nurseToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "doctorId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "nurseId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "patientId",
+			"value": "REEMPLAZAR_CON_ID_REAL",
+			"type": "string",
+			"description": "ID de un paciente existente en el sistema"
+		},
+		{
+			"key": "diagnosticId",
+			"value": "REEMPLAZAR_CON_ID_REAL",
+			"type": "string",
+			"description": "ID de un diagnóstico existente (opcional)"
+		},
+		{
+			"key": "prescriptionId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "allergyId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

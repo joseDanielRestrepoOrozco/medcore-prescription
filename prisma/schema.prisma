@@ -65,3 +65,25 @@ model PatientAllergy {
 
     @@index([patientId])
 }
+
+model MedicationTemplate {
+    id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+    code                String   @unique // Código único del medicamento
+    name                String // Nombre comercial
+    genericName         String // Nombre genérico
+    category            String // "Analgésico", "Antibiótico", "Antihipertensivo", etc.
+    commonDiagnosis     String[] // Diagnósticos comunes para este medicamento
+    dosage              String // Dosis estándar: "500mg", "10ml"
+    frequency           String // Frecuencia común: "cada 8 horas", "3 veces al día"
+    duration            Int // Duración típica en días
+    durationType        String   @default("días")
+    administrationRoute String // "oral", "intravenosa", "tópica", "intramuscular"
+    instructions        String? // Instrucciones generales
+    warnings            String? // Advertencias y contraindicaciones
+    isActive            Boolean  @default(true)
+    createdAt           DateTime @default(now())
+    updatedAt           DateTime @updatedAt
+
+    @@index([category])
+    @@map("medication_templates")
+}
